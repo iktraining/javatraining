@@ -1,37 +1,37 @@
-package schoolclass;
+package trainig.model.schoolclass;
 
 public class SchoolClass {
-	private ClassCode classCode;
-	private ClassName className;
+	private ClassCode code;
+	private ClassName name;
 
 	public SchoolClass(ClassCode code, ClassName name){
-		classCode  = code;
-		className  = name;
+		this.code  = code;
+		this.name  = name;
 	}
 
 	public ClassCode getCode(){
-		return classCode;
+		return code;
 	}
 
 	public ClassName getName(){
-		return className;
+		return name;
 	}
 
 	public boolean hasCode() {
-		if(classCode == null) {
+		if(code == null) {
 			return false;
 		}
-		if(classCode.isEmpty()) {
+		if(code.isEmpty()) {
 			return false;
 		}
 		return true;
 	}
 
 	public boolean hasName() {
-		if(className == null) {
+		if(name == null) {
 			return false;
 		}
-		if(className.isEmpty()) {
+		if(name.isEmpty()) {
 			return false;
 		}
 		return true;

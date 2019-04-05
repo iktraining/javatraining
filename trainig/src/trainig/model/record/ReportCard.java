@@ -1,8 +1,8 @@
-package record;
+package trainig.model.record;
 
 import java.util.ArrayList;
 
-import student.StudentNo;
+import trainig.model.student.StudentNo;
 
 public class ReportCard {
 	private StudentNo studentNo;
@@ -36,5 +36,10 @@ public class ReportCard {
 	}
 	public int getRecordsSize() {
 		return records.size();
+	}
+
+	@Override
+	public String toString() {
+		return String.format("ReportCard [studentNo=%s, records=%s]", studentNo, records);
 	}
 }

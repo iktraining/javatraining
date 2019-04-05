@@ -1,37 +1,37 @@
-package subject;
+package trainig.model.subject;
 
 public class Subject {
-	private SubjectCode subjectCode;
-	private SubjectName subjectName;
+	private SubjectCode code;
+	private SubjectName name;
 
 	public Subject(SubjectCode code, SubjectName name) {
-		this.subjectCode = code;
-		this.subjectName = name;
+		this.code = code;
+		this.name = name;
 	}
 
 	public SubjectCode getCode() {
-		return subjectCode;
+		return code;
 	}
 
 	public SubjectName getName() {
-		return subjectName;
+		return name;
 	}
 
 	public boolean hasCode() {
-		if(subjectCode == null) {
+		if(code == null) {
 			return false;
 		}
-		if(subjectCode.isEmpty()) {
+		if(code.isEmpty()) {
 			return false;
 		}
 		return true;
 	}
 
 	public boolean hasName() {
-		if(subjectName == null) {
+		if(name == null) {
 			return false;
 		}
-		if(subjectName.isEmpty()) {
+		if(name.isEmpty()) {
 			return false;
 		}
 		return true;

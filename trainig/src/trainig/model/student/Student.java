@@ -1,6 +1,6 @@
-package student;
+package trainig.model.student;
 
-import schoolclass.SchoolClass;
+import trainig.model.schoolclass.SchoolClass;
 
 public class Student {
 	private StudentNo no;
@@ -13,19 +13,19 @@ public class Student {
 		this.schoolClass = schoolClass;
 	}
 
-	public StudentNo getStudentNo() {
+	public StudentNo getNo() {
 		return no;
 	}
 
-	public StudentName getStudentName() {
+	public StudentName getName() {
 		return name;
 	}
 
-	public SchoolClass getStudentClass() {
+	public SchoolClass getSchoolClass() {
 		return schoolClass;
 	}
 
-	public boolean hasStudentNo() {
+	public boolean hasNo() {
 		if(no == null) {
 			return false;
 		}
@@ -35,7 +35,7 @@ public class Student {
 		return true;
 	}
 
-	public boolean hasStudentName() {
+	public boolean hasName() {
 		if(no == null) {
 			return false;
 		}if(name.isEmpty()) {

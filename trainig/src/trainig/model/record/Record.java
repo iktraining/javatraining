@@ -1,6 +1,6 @@
-package record;
+package trainig.model.record;
 
-import subject.Subject;
+import trainig.model.subject.Subject;
 
 public class Record {
 	private Subject subject;
@@ -16,7 +16,7 @@ public class Record {
 		}
 		return true;
 	}
-	public boolean hasRecordPoint() {
+	public boolean hasPoint() {
 		if(point == null) {
 			return false;
 		}
