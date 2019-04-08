@@ -26,4 +26,4 @@ hs_err_pid*
 /trainig/.metadata/
 
 # cmd
-/trainig/src/コマンドプロンプト
+/trainig/src/sql/cmd.exe
