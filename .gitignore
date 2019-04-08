@@ -24,3 +24,6 @@ hs_err_pid*
 /.metadata/
 
 /trainig/.metadata/
+
+# cmd
+/trainig/src/コマンドプロンプト
