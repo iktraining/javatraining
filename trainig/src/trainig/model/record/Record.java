@@ -10,6 +10,14 @@ public class Record {
 		this.subject = subject;
 		this.point = point;
 	}
+	public Subject getSubject() {
+		return subject;
+	}
+
+	public RecordPoint getRecordPoint() {
+		return point;
+	}
+
 	public boolean hasSubject() {
 		if(subject == null) {
 			return false;
