@@ -9,36 +9,24 @@ import trainig.model.schoolclass.ClassName;
 import trainig.model.student.StudentName;
 
 public class RegisteStudent {
-		private Connection conn = null;
-		private DBConnection db = null;
+		private Connection conn;
+		private DBConnection db;
 
 		public RegisteStudent() {}
 //生徒登録
-		public void registe(StudentName studentName, ClassName className) {
-			db = new DBConnection();
-			if(db.connect()) {//DB接続確立
-				conn = db.getConnection();
-			}else {
-				System.out.println("データベース接続に失敗しました。");
-				System.out.println("プログラムを終了します。");
-				return;
-			}
+		public boolean registe(StudentName studentName, ClassName className) {
+			conn = db.getConnection();
 			PreparedStatement pstmt = null;
 			try {
 				String sql = "insert into students(student_name, class_code) values( ? ,?)";
 				pstmt = conn.prepareStatement(sql);
 				pstmt.setString(1, studentName.getName());
-
-				if(null == getClassCode(className)) {
-					System.out.printf("%s というクラス名は存在しません\n", className.getName());
-					System.out.println("プログラムを終了します。");
-					return;
-				}
 				pstmt.setString(2, getClassCode(className));
 				int num = pstmt.executeUpdate();
-				System.out.println("登録が完了しました。");
+				return true;
 			}catch(SQLException e) {
 				e.printStackTrace();
+				return false;
 			}finally {
 				try {
 					if(pstmt != null)pstmt.close();

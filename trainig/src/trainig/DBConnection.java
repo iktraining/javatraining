@@ -8,11 +8,11 @@ public class DBConnection {
 	private static final String url = "jdbc:postgresql://localhost:5432/training";
 	private static final String user = "postgres";
 	private static final String password = "am00001";
-	private Connection conn = null;
+	private static Connection conn = null;
 
 	public DBConnection() {}
 
-	public boolean connect() {
+	public static boolean connect() {
 		try {
 			conn = DriverManager.getConnection(url, user, password);
 			//↑ 決め打ち ("jdbc:postgresql://PostgreSQLサーバ:ポート番号/DB名","ユーザ名","パスワード")
@@ -23,7 +23,7 @@ public class DBConnection {
 		}
 	}
 
-	public void cut() {
+	public static void cut() {
 		try {
 			if(conn != null)conn.close();
 		}catch(SQLException e) {
@@ -31,7 +31,7 @@ public class DBConnection {
 		}
 	}
 
-	public Connection getConnection() {
+	public static Connection getConnection() {
 		return conn;
 	}
 }
