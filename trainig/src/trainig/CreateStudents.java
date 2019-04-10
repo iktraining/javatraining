@@ -11,7 +11,6 @@ import trainig.model.student.StudentName;
 
 public class CreateStudents {
 	private static Connection conn;
-	private static DBConnection db;
 
 	public static void main(String[] args) {
 		System.out.println("--- 生徒登録システム ---");
@@ -23,11 +22,6 @@ public class CreateStudents {
 		ClassName className = new ClassName(scan.nextLine());
 		scan.close();
 
-		if(!isConnectDB()) {
-			System.out.println("データベース接続に失敗しました。");
-			System.out.println("プログラムを終了します。");
-			return;
-		}
 		if(!existenceClass(className)) {
 			System.out.printf("%s というクラス名は存在しません\n", className.getName());
 			System.out.println("プログラムを終了します。");
@@ -43,9 +37,11 @@ public class CreateStudents {
 	}
 //クラスコード存在確認チェック
 	public static boolean existenceClass(ClassName className) {
+		PreparedStatement pstmt = null;
+		String sql = "select class_code from classes where class_name = ?";
 		try {
-			String sql = "select class_code from classes where class_name = ?";
-			PreparedStatement pstmt = conn.prepareStatement(sql);
+			conn = DBConnection.getConnection();
+			pstmt = conn.prepareStatement(sql);
 			pstmt.setString(1, className.getName());
 			ResultSet rset = pstmt.executeQuery();
 			if(rset.next()){
@@ -54,19 +50,15 @@ public class CreateStudents {
 			if(rset != null)rset.close();
 			return false;
 		}catch(SQLException e) {
-			System.out.println(e.getMessage());
 			e.printStackTrace();
-			db.cut();
 			return false;
+		}finally {
+			try {
+				if(pstmt != null)pstmt.close();
+				if(conn != null)DBConnection.cut();
+			}catch(SQLException e) {
+				e.printStackTrace();
+			}
 		}
 	}
-//DB接続
-	public static boolean isConnectDB() {
-		if(db.connect()) {//DB接続確立
-			conn = db.getConnection();
-			return true;
-		}
-		return false;
-	}
-
 }

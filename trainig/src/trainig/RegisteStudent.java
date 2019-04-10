@@ -7,18 +7,22 @@ import java.sql.SQLException;
 
 import trainig.model.schoolclass.ClassName;
 import trainig.model.student.StudentName;
+import trainig.DBConnection;
 
 public class RegisteStudent {
 		private Connection conn;
-		private DBConnection db;
 
 		public RegisteStudent() {}
 //生徒登録
 		public boolean registe(StudentName studentName, ClassName className) {
-			conn = db.getConnection();
 			PreparedStatement pstmt = null;
+			conn =  DBConnection.getConnection();
+			String sql = "insert into students(student_name, class_code) values( ? ,?)";
+			if(!isConnectDB()) {
+				return false;
+			}
 			try {
-				String sql = "insert into students(student_name, class_code) values( ? ,?)";
+				conn = DBConnection.getConnection();
 				pstmt = conn.prepareStatement(sql);
 				pstmt.setString(1, studentName.getName());
 				pstmt.setString(2, getClassCode(className));
@@ -30,7 +34,7 @@ public class RegisteStudent {
 			}finally {
 				try {
 					if(pstmt != null)pstmt.close();
-					if(conn != null)db.cut();
+					if(conn != null)DBConnection.cut();
 				}catch(SQLException e) {
 					e.printStackTrace();
 				}
@@ -53,5 +57,25 @@ public class RegisteStudent {
 				e.printStackTrace();
 			}
 			return code;
+		}
+//DB接続確認
+		public boolean isConnectDB() {
+			try{
+				if(!DBConnection.connect()) {//DB接続確立
+					System.out.println("DB接続に失敗しました");
+					return false;
+				}
+				return true;
+			}catch(Exception e) {
+				e.printStackTrace();
+				return false;
+			}finally {
+				try {
+					if(conn != null)DBConnection.cut();
+				}catch(Exception e) {
+					e.printStackTrace();
+				}
+			}
+
 		}
 }

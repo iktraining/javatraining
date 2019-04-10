@@ -32,6 +32,9 @@ public class DBConnection {
 	}
 
 	public static Connection getConnection() {
-		return conn;
+		if(DBConnection.connect()) {
+			return conn;
+		}
+		return conn = null;
 	}
 }
