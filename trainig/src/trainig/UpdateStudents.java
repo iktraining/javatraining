@@ -20,67 +20,80 @@ public class UpdateStudents {
 		System.out.println("--- 生徒情報修正システム ---");
 		System.out.println("情報修正したい生徒番号を入力してください");
 		System.out.print("生徒番号 ==> ");
-		try {
-			BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-			String	tmp = reader.readLine();
 
-			if(!inputNumberCheck(tmp)) {
-				System.out.println("整数値を入力してください。");
-				System.out.println("プログラムを終了します。");
-				return;
-			}
-			if(!isConnectDB()) {
-				System.out.println("データベース接続に失敗しました。");
-				System.out.println("プログラムを終了します。");
-				return;
-			}
-			if(!existenceStudent(no)) {
-				System.out.printf("%d 番の生徒は存在しません\n", no);
-				System.out.println("プログラムを終了します。");
-				return;
-			}
+		if(!inputNumberCheck(inputLine())) {
+			System.out.println("整数値を入力してください。");
+			System.out.println("プログラムを終了します。");
+			return;
+		}
+		if(!isConnectDB()) {
+			System.out.println("データベース接続に失敗しました。");
+			System.out.println("プログラムを終了します。");
+			return;
+		}
+		if(!existenceStudent(no)) {
+			System.out.printf("%d 番の生徒は存在しません\n", no);
+			System.out.println("プログラムを終了します。");
+			return;
+		}
+		StudentNo studentNo = new StudentNo(no);
 	//名前修正
-			StudentNo studentNo = new StudentNo(no);
-			AcquireStudentName acquireStudentName = new AcquireStudentName();
-			acquireStudentName.acquireName(studentNo);
-			System.out.printf("登録されている氏名は %s です。修正しますか？\n", acquireStudentName.getStudentName().getName());
-			System.out.println("yes/noを入力してください ==> ");
-			tmp = reader.readLine();
-			if(isModification(tmp)) {
-				ModificationStudentName modificationStudentName = new ModificationStudentName();
-				modificationStudentName.modifyName(studentNo);
-			}
+		requestModifyStudentName(studentNo);
 	//クラス修正
-			AcquireClassName acquireClassName = new AcquireClassName();
-			acquireClassName.acquireName(studentNo);
-			System.out.printf("登録されているクラスは %s です。修正しますか？\n", acquireClassName.getClassName().getName());
-			System.out.println("yes/noを入力してください ==> ");
-			tmp = reader.readLine();
-			if(isModification(tmp)) {
-				ModificationClass modificationClass = new ModificationClass();
-				modificationClass.modifyClass(studentNo);
-			}
+		requestModifyClassName(studentNo);
 	//成績修正
-
-			AcquireRecode acquireRecode = new AcquireRecode();
-			acquireRecode.acquireRecode(studentNo);
-			System.out.println("登録されている成績は以下の値です。修正しますか？");
-			ArrayList<Record> recordList = acquireRecode.getRecordList();
-			for(int i = 0; i < recordList.size(); i++) {
-				System.out.printf("%s\t", recordList.get(i).getSubject().getName().getName());
-				System.out.printf("%d\n", recordList.get(i).getRecordPoint().getPoint());
-			}
-			System.out.println("yes/noを入力してください ==> ");
-			tmp = reader.readLine();
-			if(isModification(tmp)) {
-				ModificationRecord modificationRecord = new ModificationRecord();
-				modificationRecord.modifyRecord(studentNo);
-			}
+		requestModifyRecord(studentNo);
+		DBConnection.cut();
+		System.out.println("生徒情報修正システム終了");
+	}
+//入力メソッド
+	public static String inputLine() {
+		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+		String line = null;
+		try {
+			line = reader.readLine();
 		}catch(IOException e) {
 			e.printStackTrace();
 		}
-		DBConnection.cut();
-		System.out.println("生徒情報修正システム終了");
+		return line;
+	}
+//名前修正メソッド
+	public static void requestModifyStudentName(StudentNo studentNo) {
+		AcquireStudentName acquireStudentName = new AcquireStudentName();
+		acquireStudentName.acquireName(studentNo);
+		System.out.printf("登録されている氏名は %s です。修正しますか？\n", acquireStudentName.getStudentName().getName());
+		System.out.println("yes/noを入力してください ==> ");
+		if(isModification(inputLine())) {
+			ModificationStudentName modificationStudentName = new ModificationStudentName();
+			modificationStudentName.modifyName(studentNo);
+		}
+	}
+//クラス修正メソッド
+	public static void requestModifyClassName(StudentNo studentNo) {
+		AcquireClassName acquireClassName = new AcquireClassName();
+		acquireClassName.acquireName(studentNo);
+		System.out.printf("登録されているクラスは %s です。修正しますか？\n", acquireClassName.getClassName().getName());
+		System.out.println("yes/noを入力してください ==> ");
+		if(isModification(inputLine())) {
+			ModificationClass modificationClass = new ModificationClass();
+			modificationClass.modifyClass(studentNo);
+		}
+	}
+//成績修正メソッド
+	public static void requestModifyRecord(StudentNo studentNo) {
+		AcquireRecord acquireRecode = new AcquireRecord();
+		acquireRecode.acquireRecord(studentNo);
+		System.out.println("登録されている成績は以下の値です。修正しますか？");
+		ArrayList<Record> recordList = acquireRecode.getRecordList();
+		for(int i = 0; i < recordList.size(); i++) {
+			System.out.printf("%s\t", recordList.get(i).getSubject().getName().getName());
+			System.out.printf("%d\n", recordList.get(i).getRecordPoint().getPoint());
+		}
+		System.out.println("yes/noを入力してください ==> ");
+		if(isModification(inputLine())) {
+			ModificationRecord modificationRecord = new ModificationRecord();
+			modificationRecord.modifyRecord(studentNo);
+		}
 	}
 //修正実行確認
 	public static boolean isModification(String tmp) {

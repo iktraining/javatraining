@@ -13,12 +13,12 @@ import trainig.model.subject.Subject;
 import trainig.model.subject.SubjectCode;
 import trainig.model.subject.SubjectName;
 
-public class AcquireRecode {
+public class AcquireRecord {
 	private ArrayList<Record> recordList;
 
-	public AcquireRecode() {}
+	public AcquireRecord() {}
 
-	public void acquireRecode(StudentNo studentNo) {
+	public void acquireRecord(StudentNo studentNo) {
 		Connection conn = DBConnection.getConnection();
 		PreparedStatement pstmt = null;
 		try {
