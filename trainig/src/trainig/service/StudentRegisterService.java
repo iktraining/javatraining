@@ -17,6 +17,5 @@ public class StudentRegisterService {
 			Optional<ClassCode> optionalClassCode = classDataAccess.getCode(className);
 			StudentDataAccess studentDataAccess = new StudentDataAccess();
 			studentDataAccess.register(studentName, optionalClassCode.get());
-
 		}
 }
