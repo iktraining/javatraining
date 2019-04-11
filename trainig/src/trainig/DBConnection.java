@@ -32,9 +32,10 @@ public class DBConnection {
 	}
 
 	public static Connection getConnection() {
-			return conn;
+		return conn;
 
 	}
+
 	//DB接続確認
 	public static boolean isConnectionDB() {
 		if(null == DBConnection.getConnection()) {
