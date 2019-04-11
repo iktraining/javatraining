@@ -12,14 +12,14 @@ public class DBConnection {
 
 	public DBConnection() {}
 
-	public static boolean connect() {
+	public static Connection connect() {
 		try {
 			conn = DriverManager.getConnection(url, user, password);
 			//↑ 決め打ち ("jdbc:postgresql://PostgreSQLサーバ:ポート番号/DB名","ユーザ名","パスワード")
-			return true;
+			return conn;
 		}catch(Exception e){
 			e.printStackTrace();
-			return false;
+			return conn;
 		}
 	}
 
@@ -33,5 +33,13 @@ public class DBConnection {
 
 	public static Connection getConnection() {
 		return conn;
+	}
+
+	//DB接続確認
+	public static boolean isConnectionDB() {
+		if(null == DBConnection.getConnection()) {
+			return false;
+		}
+		return true;
 	}
 }
