@@ -14,7 +14,7 @@ public class ClassDataAccess {
 	public ClassDataAccess() {}
 
 //クラス名オブジェクトからOptionalでラップされたクラスコードオブジェクトを返す
-//クラスコードが取得できなかった場合も同上。
+//クラスコードが取得できなかった場合、nullのOptionalを返す
 	public Optional<ClassCode> getCode(ClassName className) {
 
 		String code = null;
