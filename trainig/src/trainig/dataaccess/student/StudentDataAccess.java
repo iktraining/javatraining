@@ -67,5 +67,20 @@ public class StudentDataAccess {
 			throw new RuntimeException(e);
 		}
 	}
+//DBから入力された生徒番号と一致する番号があるか調べる。
+//あったらtrue、なければfalseが返る
+	public boolean findStudentByNo(StudentNo studentNo){
+		String sql = "select student_no from students where student_no = ?";
+		try(PreparedStatement pstmt = DBConnection.getConnection().prepareStatement(sql);) {
+			pstmt.setInt(1, studentNo.getNo());
+			ResultSet rset = pstmt.executeQuery();
+			if(rset.next()){
+				return true;
+			}
+			return false;
+		}catch(SQLException e) {
+			throw new RuntimeException(e);
+		}
+	}
 }
 

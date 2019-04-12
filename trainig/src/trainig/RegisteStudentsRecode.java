@@ -1,153 +1,147 @@
 package trainig;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Optional;
 import java.util.Scanner;
 
+import trainig.model.record.Record;
 import trainig.model.record.RecordPoint;
+import trainig.model.record.ReportCard;
 import trainig.model.student.StudentNo;
-import trainig.model.subject.SubjectCode;
+import trainig.model.subject.Subject;
+import trainig.model.subject.SubjectList;
+import trainig.model.validation.Validation;
+import trainig.service.RecordInfoService;
+import trainig.service.RecordRegisterService;
+import trainig.service.StudentInfoService;
+import trainig.service.SubjectInfoService;
 
 public class RegisteStudentsRecode {
-	private static Connection conn;
-	private static int no;
-	private static String[] subjectNameArr = {"英語","数学","国語","社会","理科"};
-	private static String[] subjectCodeArr = {"english","math","japanese","social","science"};
 
 	public static void main(String[] args) {
-		int[] points = new int[5];
-
 		System.out.println("--- 生徒成績登録システム ---");
+		Scanner scan = new Scanner(System.in);
+		try {
+			DBConnection.connect();
+			StudentNo studentNo = new StudentNo(studentNoListener(scan));
+			StudentInfoService studentInfoService = new StudentInfoService();
+		//生徒存在確認
+			if(!studentInfoService.existenceStudent(studentNo)) {
+				System.out.printf("%d 番の生徒は存在しません\n", studentNo.getNo());
+				System.out.println("プログラムを終了します。");
+				return;
+			}
+		//成績表入力
+			 ReportCard reportCard = inputReportCard(scan, studentNo);
+		//入力した成績を表示
+			inputViewer(reportCard);
+		//成績登録の実行判断
+			if(execution(scan)) {
+				executionRecordRegiter(scan, reportCard);
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
+		}finally {
+			DBConnection.cut();
+			scan.close();
+			System.out.println("生徒成績登録終了");
+		}
+	}
+//生徒番号入力
+	public static int studentNoListener(Scanner scan) {
+		String	strNo = null;
 		System.out.println("登録したい生徒番号を入力してください");
 		System.out.print("生徒番号 ==> ");
-		Scanner scan = new Scanner(System.in);
-		String	tmp = scan.nextLine();
+		do {
+			strNo = scan.nextLine();
+			if(Validation.numberOfStringType(strNo)) {
+				break;
+			}
+			System.out.print("整数値を入力してください。==> ");
+		}while(true);
+		return Integer.parseInt(strNo);
+	}
+//入力内容表示
+	public static void inputViewer(ReportCard reportCard) {
+		System.out.println("入力内容はこちらでよろしいですか？");
+		for(Record record:reportCard.getRecords()) {
+			System.out.printf("%s\t", record.getSubject().getName().getName());
+			System.out.printf("%d\n", record.getPoint().getPoint());
+		}
+	}
+//実行するかどうかを判断
+	public static boolean execution(Scanner scan) {
+		String executionCommand = null;
+		do {
+			System.out.println("yes/noを入力してください ==> ");
+			executionCommand = scan.nextLine();
+			if(Validation.isExecutionCommand(executionCommand)) {
+				break;
+			}
+		}while(true);
+		if(executionCommand.equals("yes")) {
+			return true;
+		}
+		return false;
+	}
+//成績の入力
+	public static ReportCard inputReportCard(Scanner scan, StudentNo studentNo) {
+		SubjectInfoService subjectInfoService = new SubjectInfoService();
+		SubjectList subjectList = subjectInfoService.acquireSubjectList();
 
-		if(!inputNumberCheck(tmp)) {
-			System.out.println("整数値を入力してください。");
-			System.out.println("プログラムを終了します。");
-			scan.close();
-			return;
-		}
-		if(!isConnectDB()) {
-			System.out.println("データベース接続に失敗しました。");
-			System.out.println("プログラムを終了します。");
-			scan.close();
-			return;
-		}
-		if(!existenceStudent(no)) {
-			System.out.printf("%d 番の生徒は存在しません\n", no);
-			System.out.println("プログラムを終了します。");
-			scan.close();
-			return;
-		}
-		StudentNo studentNo = new StudentNo(no);
+		String strPoint = null;
+		ArrayList<Record> recordList = new ArrayList<Record>();
 
-		for(int i= 0; i < 5; i++) {
-			boolean pass = true;
+		for(Subject subject: subjectList.getList()) {
 			do{
-				if(!pass) {
-					System.out.println("成績を１～１００の整数値で入力してください");
-				}
-				System.out.printf("%sの成績を入力してください ==> ", subjectNameArr[i]);
-				tmp = scan.nextLine();
-				 if(!inputNumberCheck(tmp)) {
-					 pass = false;
+				System.out.printf("%sの成績を入力してください ==> ", subject.getName().getName());
+				strPoint = scan.nextLine();
+				 if(!Validation.numberOfStringType(strPoint)) {
+					 System.out.println("成績を１～１００の整数値で入力してください");
 					 continue;
 				 }
-				 pass = recodeRangeCheck(no);
-			}while(!pass);
-			points[i] = no;
+				 if(!RecordPoint.rangeValidation(Integer.parseInt(strPoint))) {
+					 System.out.println("成績を１～１００の整数値で入力してください");
+					 continue;
+				 }
+				 break;
+			}while(true);
+			recordList.add(
+				new Record(
+					subject, new RecordPoint(Integer.parseInt(strPoint))
+				)
+			);
 		}
-
-		System.out.println("入力内容はこちらでよろしいですか？");
-		displayInputItems(points);
-		System.out.println("yes/noを入力してください ==> ");
-		tmp = scan.nextLine();
-		scan.close();
-		if(!isRunningRegiste(tmp)) {
-			System.out.println("プログラムを終了します。");
-			return;
-		}
-
-		//登録開始
-		ArrayList<SubjectCode> subjectCodeList = new ArrayList<SubjectCode>();
-		ArrayList<RecordPoint> recordPointList = new ArrayList<RecordPoint>();
-
-		for(int i= 0; i < points.length; i++) {
-			subjectCodeList.add(new SubjectCode(subjectCodeArr[i]));
-			recordPointList.add(new RecordPoint(points[i]));
-		}
-		RecodeDBRegister recordRegister = new RecodeDBRegister();
-		recordRegister.registe(studentNo,subjectCodeList, recordPointList);
-		System.out.println("生徒成績登録終了");
+		ReportCard reportCard = new ReportCard(studentNo, recordList);
+		return reportCard;
 	}
-//登録実行確認
-	public static boolean isRunningRegiste(String tmp) {
-		if(tmp.equals("yes")) {
-			return true;
-		}
-		if(tmp.equals("no")) {
-			return false;
-		}
-		return false;
-	}
-//入力項目一覧表示
-	public static void displayInputItems(int[] points) {
-		for(int i = 0; i < points.length; i++) {
-			System.out.printf("%s\t", subjectNameArr[i]);
-			System.out.printf("%d\n", points[i]);
-		}
-	}
-//数値チェック
-	public static boolean inputNumberCheck(String number) {
-		try{
-			no = Integer.parseInt(number);
-			return true;
-		}catch(NumberFormatException e) {
-			return false;
-		}
-	}
-//成績範囲チェック
-	public static boolean recodeRangeCheck(int recode) {
-		if(recode < 1) {
-			return false;
-		}
-		if(recode > 100) {
-			return false;
-		}
-		return true;
-	}
-
-//在籍確認
-	public static boolean existenceStudent(int no) {
-		try {
-			String sql = "select student_no from students where student_no = ?";
-			PreparedStatement pstmt = conn.prepareStatement(sql);
-			pstmt.setInt(1, no);
-			ResultSet rset = pstmt.executeQuery();
-			if(rset.next()){
-				return true;
+//成績登録の実行
+	public static void executionRecordRegiter(Scanner scan, ReportCard reportCard) {
+		 {
+			for(Record record: reportCard.getRecords()) {
+				RecordRegisterService recordRegisterService = new RecordRegisterService();
+				//既に登録済みの場合の処理
+				RecordInfoService recordInfoService = new RecordInfoService();
+				if(recordInfoService.hasRecord(reportCard.getStudentNo(), record.getSubject().getName())) {
+					Optional<Record> optionalRegisteredRecord = recordInfoService.acqireRecord(reportCard.getStudentNo(), record.getSubject().getName());
+					Record registeredRecord = optionalRegisteredRecord.orElseThrow();
+					System.out.printf("既に %s の成績は %d 点で登録済みです。\n",
+							registeredRecord.getSubject().getName().getName(),
+							registeredRecord.getPoint().getPoint()
+					);
+					System.out.println("上書きしますか？");
+					if(execution(scan)) {
+						//上書き実行
+						recordRegisterService.updateRegisteredRecord(record, reportCard.getStudentNo());
+						System.out.printf("%s の成績を %d 点で上書き登録しました。\n",
+							record.getSubject().getName().getName(),
+							record.getPoint().getPoint()
+						);
+					}
+					continue;
+				}
+				recordRegisterService.register(record, reportCard.getStudentNo());
 			}
-			if(rset != null)rset.close();
-			return false;
-		}catch(SQLException e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			DBConnection.cut();
-			return false;
 		}
 	}
-//DB接続
-	public static boolean isConnectDB() {
-		if(DBConnection.connect()) {//DB接続確立
-			conn = DBConnection.getConnection();
-			return true;
-		}
-		return false;
-	}
-
 }
