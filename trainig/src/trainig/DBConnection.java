@@ -33,7 +33,6 @@ public class DBConnection {
 
 	public static Connection getConnection() {
 		return conn;
-
 	}
 
 	//DB接続確認
