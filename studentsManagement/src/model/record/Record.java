@@ -1,0 +1,37 @@
+package model.record;
+
+import model.subject.Subject;
+
+public class Record {
+	private Subject subject;
+	private RecordPoint point;
+
+	public Record(Subject subject, RecordPoint point) {
+		this.subject = subject;
+		this.point = point;
+	}
+
+	public Subject getSubject() {
+		return subject;
+	}
+
+	public RecordPoint getPoint() {
+		return point;
+	}
+
+	public boolean hasSubject() {
+		if(subject == null) {
+			return false;
+		}
+		return true;
+	}
+	public boolean hasPoint() {
+		if(point == null) {
+			return false;
+		}
+		if(point.isEmpty()) {
+			return false;
+		}
+		return true;
+	}
+}
